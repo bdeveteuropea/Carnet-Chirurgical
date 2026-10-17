@@ -15,6 +15,9 @@
 .photo-card figcaption,.procedure-card figcaption{position:absolute;left:12px;bottom:11px;padding:6px 10px;border-radius:999px;background:#173f37df;color:#fff;font-size:11px;font-weight:750;letter-spacing:.2px}
 .procedure-card{display:flex;align-items:center;justify-content:center;min-height:300px;background:linear-gradient(145deg,#fff,#f6faf6)}
 .procedure-card svg{width:100%;height:300px;display:block}
+.procedure-card img{width:100%;height:300px;object-fit:cover;display:block}
+.procedure-card.radiography{background:#050608}
+.procedure-card.radiography img{object-fit:contain;background:#050608}
 .procedure-card figcaption{background:#ed865fe8}
 .evidence-note{margin-top:18px;background:#e9f5ee;color:#285b4c;border:1px solid #cee6d6}
 .block.reference{background:#f7fbf8;border-color:#d6e8db}
@@ -27,7 +30,7 @@
 @media(max-width:800px){
   .artwork{height:155px}
   .detail-media{grid-template-columns:1fr}
-  .photo-card img,.procedure-card,.procedure-card svg{height:235px;min-height:235px}
+  .photo-card img,.procedure-card,.procedure-card svg,.procedure-card img{height:235px;min-height:235px}
 }
 </style></head><body><div class="app"><aside class="side"><div class="logo">✳ CUADERNO<span>QUIRÚRGICO · UEM</span></div><nav><button class="nav active" data-page="dashboard">◫ &nbsp; Panel general</button><button class="nav" data-page="registro">☷ &nbsp; Registro operatorio</button><button class="nav" data-page="atlas">▦ &nbsp; Atlas de cirugías</button><button class="nav" data-page="progreso">◷ &nbsp; Mi evolución</button><button class="nav" data-page="datos">⇅ &nbsp; Mis datos</button></nav><div class="side-footer">Hospital Clínico Veterinario · UEM<br>Colaboración en tejidos blandos y traumatología<br>Desde el 9 de octubre de 2026</div></aside><main class="main" id="main"></main></div><div class="toast" id="toast"></div><input type="file" id="import" accept="application/json,.json"><script>
 const CATALOG={
@@ -95,12 +98,60 @@ function applyVS2V2(out){
   });
   return out;
 }
+const CORRECTIONS_KEY='cuaderno-quirurgico-correcciones-2026-10-17-v1';
+const CASE_ASSETS={
+  Q001:{
+    procedureImage:'assets/planificacion-mastocitoma-perivulvar.svg',
+    procedureAlt:'Ilustración anatómica de la vulva canina con un mastocitoma en el pliegue dorsal y una línea discontinua de planificación quirúrgica',
+    procedureCaption:'Ilustración anatómica original · planificación, no fotografía del paciente'
+  },
+  Q007:{image:'assets/labrador-crema.webp'},
+  Q008:{
+    image:'assets/mestizo-deerhound-crema.webp',
+    procedureImage:'assets/simulacion-radiografica-radio-cubito.webp',
+    procedureAlt:'Simulación radiográfica en dos proyecciones de una fractura conminuta de radio y cúbito tratada mediante osteosíntesis',
+    procedureCaption:'Simulación radiográfica educativa · no corresponde al paciente'
+  }
+};
+function applyCaseAssets(out){
+  Object.assign(out,CASE_ASSETS[out.id]||{});
+  return out;
+}
+function applyConfirmedCorrections(out){
+  applyCaseAssets(out);
+  if(out.id==='Q007'){
+    out.breed='Mestiza tipo Labrador, de pelaje crema';
+    out.diagnostico='Piometra en una perra mestiza tipo Labrador, de pelaje crema, de 24 kg. Ovariohisterectomía de urgencia durante una guardia nocturna.';
+  }
+  if(out.id==='Q008'){
+    out.breed='Mestizo tipo Deerhound, dolicocéfalo, de pelo áspero blanco y crema';
+    out.diagnostico='Perro mestizo de 30,1 kg, atropellado lateralmente por un coche. Fractura abierta tipo I, conminuta, del radio y cúbito izquierdos, con múltiples fragmentos. Estado neurovascular y lesiones asociadas no documentados en la nota.';
+    out.tecnica='Se contemplaron dos opciones: reconstrucción del miembro o amputación si el salvamento no era viable. La reconstrucción se realizó mediante doble placa sobre el radio: una placa craneal y otra medial, formando una construcción ortogonal. La nota registra dos tornillos en el segmento proximal y dos en el distal; no permite asegurar si este recuento corresponde a cada placa o al conjunto. Uno de ellos era un tornillo cortical fino que atravesaba ambas corticales, aparentemente bicortical. Se practicó un bloqueo regional descrito como bloqueo del plexo braquial justo proximal al codo con bupivacaína. Pendiente confirmar abordajes, método de reducción, sistema y diámetro de placas, longitud y función exacta de los tornillos, tratamiento del cúbito, lavado y desbridamiento.';
+    out.material=String(out.material||'').replace(
+      'Observado: dos placas sobre el radio, una craneal y otra medial; bupivacaína para el bloqueo regional.',
+      'Observado y confirmado: dos placas sobre el radio, una craneal y otra medial. La nota registra dos tornillos en el segmento proximal y dos en el distal, sin precisar si el recuento corresponde a cada placa o al conjunto; uno era un tornillo cortical fino aparentemente bicortical. Bupivacaína para el bloqueo regional.'
+    );
+    out.seguimiento=String(out.seguimiento||'').replace('Pendiente: grado de fractura abierta, antibioterapia','Pendiente: antibioterapia');
+    out.puntosCriticos=String(out.puntosCriticos||'').replace(
+      'La conminución y el atropello sugieren un traumatismo de alta energía, pero no permiten por sí solos asignar el grado de fractura abierta sin describir la herida y la lesión de tejidos blandos.',
+      'La fractura abierta fue confirmada como tipo I; conviene documentar también el tamaño de la herida y el estado de los tejidos blandos que sustentaron esta clasificación.'
+    );
+  }
+  return out;
+}
+function defaultRecords(){
+  return structuredClone(base).map(applyVS2).map(applyVS2V2).map(applyConfirmedCorrections);
+}
 let records=load(), page='dashboard', opened=null, editing=null, search='', cat='Todas';
 function load(){
   try{
     const v=JSON.parse(localStorage.getItem(KEY));
-    if(!Array.isArray(v)) return structuredClone(base).map(applyVS2).map(applyVS2V2);
-    const enrichedKeys=['material','protocolo','puntosCriticos','fuentes','image'];
+    if(!Array.isArray(v)){
+      localStorage.setItem(CORRECTIONS_KEY,'1');
+      return defaultRecords();
+    }
+    const applyCorrections=localStorage.getItem(CORRECTIONS_KEY)!=='1';
+    const enrichedKeys=['material','protocolo','puntosCriticos','fuentes','image','procedureImage','procedureAlt','procedureCaption'];
     const migrated=v.map(r=>{
       const b=base.find(x=>x.id===r.id);
       if(!b) return r;
@@ -118,14 +169,16 @@ function load(){
           out[k]=(String(out[k]||'').trim()+'\n\n'+addition).trim();
         }
       });
-      return applyVS2V2(applyVS2(out));
+      const enriched=applyCaseAssets(applyVS2V2(applyVS2(out)));
+      return applyCorrections?applyConfirmedCorrections(enriched):enriched;
     });
     const newest=base.find(x=>x.id==='Q008');
-    if(newest && !migrated.some(r=>r.id==='Q008')) migrated.push(applyVS2V2(applyVS2(structuredClone(newest))));
+    if(newest && !migrated.some(r=>r.id==='Q008')) migrated.push(applyConfirmedCorrections(applyVS2V2(applyVS2(structuredClone(newest)))));
     localStorage.setItem(KEY,JSON.stringify(migrated));
+    if(applyCorrections) localStorage.setItem(CORRECTIONS_KEY,'1');
     return migrated;
   }catch{
-    return structuredClone(base).map(applyVS2).map(applyVS2V2);
+    return defaultRecords();
   }
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(records));toast('Cambios guardados en este navegador')}
@@ -155,9 +208,12 @@ function artwork(r,wide=false){
   const p=(r.procedure||'').toLowerCase();
   let label=p.includes('fractura')?'TRAUMATOLOGÍA · OSTEOSÍNTESIS':p.includes('orquiect')?'CIRUGÍA REPRODUCTIVA':(p.includes('piometr')?'URGENCIA · CIRUGÍA REPRODUCTIVA':(p.includes('ovari')?'CIRUGÍA REPRODUCTIVA':(p.includes('biops')?'ONCOLOGÍA · BIOPSIA':'ONCOLOGÍA · EXÉRESIS')));
   const alt=`Retrato ilustrativo de ${r.animal||'paciente veterinario'}; no corresponde al paciente real`;
-  const photo=`<figure class="photo-card"><img src="${escapeHtml(r.image||'assets/labrador.webp')}" alt="${escapeHtml(alt)}" loading="${wide?'eager':'lazy'}"><figcaption>Imagen ilustrativa · no corresponde al paciente</figcaption></figure>`;
+  const photo=`<figure class="photo-card"><img src="${escapeHtml(r.image||'assets/labrador.webp')}" alt="${escapeHtml(alt)}" loading="${wide?'eager':'lazy'}"><figcaption>Retrato ilustrativo generado · no corresponde al paciente</figcaption></figure>`;
   if(!wide) return `<figure class="artwork" aria-label="${escapeHtml(alt)}"><img src="${escapeHtml(r.image||'assets/labrador.webp')}" alt="" loading="lazy"><figcaption class="art-caption">${label}</figcaption></figure>`;
-  return `<div class="detail-media">${photo}<figure class="procedure-card">${procedureDiagram(r)}<figcaption>Esquema didáctico original · no a escala</figcaption></figure></div>`;
+  const procedure=r.procedureImage
+    ?`<figure class="procedure-card ${r.id==='Q008'?'radiography':''}"><img src="${escapeHtml(r.procedureImage)}" alt="${escapeHtml(r.procedureAlt||'Simulación educativa del procedimiento')}" loading="eager"><figcaption>${escapeHtml(r.procedureCaption||'Simulación educativa · no corresponde al paciente')}</figcaption></figure>`
+    :`<figure class="procedure-card">${procedureDiagram(r)}<figcaption>Esquema didáctico original · no a escala</figcaption></figure>`;
+  return `<div class="detail-media">${photo}${procedure}</div>`;
 }
 function speciesThumb(name){
   const cat=name==='Gato';
@@ -191,7 +247,7 @@ function download(name,blob){const url=URL.createObjectURL(blob),a=document.crea
 function exportJSON(){download('cuaderno-quirurgico-respaldo.json',new Blob([JSON.stringify({version:1,exported:new Date().toISOString(),records},null,2)],{type:'application/json'}))}
 function exportCSV(){let keys=['id','date','patient','animal','breed','weight','procedure','category','level',...fields.map(x=>x[0])],rows=[keys,...records.map(r=>keys.map(k=>r[k]??''))];download('registro-operatorio.csv',new Blob(['\ufeff'+rows.map(row=>row.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}))}
 document.getElementById('import').addEventListener('change',async e=>{let file=e.target.files[0];if(!file)return;try{let obj=JSON.parse(await file.text()),list=Array.isArray(obj)?obj:obj.records;if(!Array.isArray(list)||list.some(x=>!x.id||!x.procedure))throw Error('Formato inválido');if(confirm(`¿Importar ${list.length} intervenciones y reemplazar las actuales?`)){records=list;save();go('registro')}}catch(err){alert('No se pudo importar el archivo: '+err.message)}e.target.value=''});
-function resetData(){if(confirm('¿Restaurar las ocho intervenciones iniciales y borrar las modificaciones locales?')){records=structuredClone(base);save();go('dashboard')}}
+function resetData(){if(confirm('¿Restaurar las ocho intervenciones iniciales y borrar las modificaciones locales?')){records=defaultRecords();localStorage.setItem(CORRECTIONS_KEY,'1');save();go('dashboard')}}
 function printBook(){let w=window.open('','_blank');if(!w){alert('Permite las ventanas emergentes para imprimir.');return}w.document.write(`<html><head><meta charset="utf-8"><title>Cuaderno quirúrgico</title><style>body{font:12px Arial;color:#222;line-height:1.5;margin:35px}article{page-break-after:always}h1{font-size:26px}h2{font-size:19px;margin:22px 0 10px}h3{font-size:14px;color:#21766a}p{white-space:pre-wrap}small{color:#777}.atlas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:10px}.atlas-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;border:1px solid #30445a;padding:15px;border-radius:12px;background:#0d1a29}.atlas-item a{color:#78dbcb}.atlas-count{display:inline-block;border-radius:10px;background:#244c4b;color:#a0eee0;min-width:37px;text-align:center;padding:7px;font-size:20px}.case-bottom{align-items:flex-end}.case-bottom>.muted{max-width:55%}</style></head><body><h1>Cuaderno quirúrgico — UEM</h1><p>Registro formativo personal · ${records.length} intervenciones</p>${records.map(r=>`<article><h2>${escapeHtml(r.id)} · ${escapeHtml(r.procedure)}</h2><small>${nice(r.date)} · ${escapeHtml(r.animal)} · Paciente ${escapeHtml(r.patient)} · ${escapeHtml(r.level)}</small>${fields.map(([k,l])=>`<h3>${l}</h3><p>${escapeHtml(r[k]||'Pendiente de completar.')}</p>`).join('')}</article>`).join('')}</body></html>`);w.document.close();w.focus();setTimeout(()=>w.print(),400)}
 function render(){({dashboard,registro,detail,edit:editView,atlas,progreso,datos:dataView}[page]||dashboard)()};document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));render();
 </script></body></html>

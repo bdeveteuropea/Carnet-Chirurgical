@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Planificación de una exéresis de mastocitoma perivulvar</title>
+  <desc id="desc">Ilustración anatómica veterinaria preoperatoria: pequeño nódulo en el pliegue dorsal de la vulva y línea discontinua de incisión, con margen ventral limitado.</desc>
+  <defs>
+    <linearGradient id="drape" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#174d50"/>
+      <stop offset=".48" stop-color="#2f7773"/>
+      <stop offset="1" stop-color="#153e43"/>
+    </linearGradient>
+    <radialGradient id="skin" cx="50%" cy="39%" r="65%">
+      <stop offset="0" stop-color="#f2c9ad"/>
+      <stop offset=".48" stop-color="#dca88d"/>
+      <stop offset=".83" stop-color="#b97966"/>
+      <stop offset="1" stop-color="#87564f"/>
+    </radialGradient>
+    <linearGradient id="foldL" x1="0" x2="1">
+      <stop offset="0" stop-color="#9b5c59"/>
+      <stop offset=".48" stop-color="#dd9c8d"/>
+      <stop offset="1" stop-color="#7f444b"/>
+    </linearGradient>
+    <linearGradient id="foldR" x1="1" x2="0">
+      <stop offset="0" stop-color="#9b5c59"/>
+      <stop offset=".48" stop-color="#e0a092"/>
+      <stop offset="1" stop-color="#7f444b"/>
+    </linearGradient>
+    <radialGradient id="nodule" cx="39%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ffd2bd"/>
+      <stop offset=".38" stop-color="#df806f"/>
+      <stop offset=".8" stop-color="#a7484d"/>
+      <stop offset="1" stop-color="#75333e"/>
+    </radialGradient>
+    <filter id="cloth" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".018 .09" numOctaves="3" seed="11" result="noise"/>
+      <feColorMatrix in="noise" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 .16 0"/>
+      <feBlend in="SourceGraphic" mode="soft-light"/>
+    </filter>
+    <filter id="skinTexture" x="-15%" y="-15%" width="130%" height="130%">
+      <feTurbulence type="fractalNoise" baseFrequency=".025" numOctaves="3" seed="7" result="n"/>
+      <feColorMatrix in="n" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 .10 0"/>
+      <feBlend in="SourceGraphic" mode="multiply"/>
+    </filter>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#3f1d2d" flood-opacity=".38"/>
+    </filter>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="7" stdDeviation="8" flood-color="#431d2b" flood-opacity=".34"/>
+    </filter>
+    <clipPath id="field"><ellipse cx="600" cy="405" rx="430" ry="355"/></clipPath>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#drape)" filter="url(#cloth)"/>
+  <path d="M0 0h1200v83C1010 45 884 55 754 92 643 123 557 124 446 94 305 56 164 48 0 88Z" fill="#76aaa1" opacity=".22"/>
+  <ellipse cx="600" cy="414" rx="452" ry="373" fill="#0e3438" opacity=".33"/>
+
+  <g clip-path="url(#field)" filter="url(#skinTexture)">
+    <rect x="135" y="35" width="930" height="735" fill="url(#skin)"/>
+    <ellipse cx="340" cy="412" rx="248" ry="370" fill="#f3c9ae" opacity=".24"/>
+    <ellipse cx="860" cy="412" rx="248" ry="370" fill="#9d5d58" opacity=".18"/>
+    <path d="M515 130c-56 90-77 185-61 288 15 95 59 167 107 213" fill="none" stroke="#925f57" stroke-width="22" opacity=".18"/>
+    <path d="M685 130c56 90 77 185 61 288-15 95-59 167-107 213" fill="none" stroke="#925f57" stroke-width="22" opacity=".18"/>
+
+    <g fill="#6f4a45" opacity=".22">
+      <circle cx="290" cy="220" r="3"/><circle cx="330" cy="266" r="2.7"/><circle cx="391" cy="187" r="2.4"/><circle cx="428" cy="286" r="2.2"/>
+      <circle cx="910" cy="220" r="3"/><circle cx="870" cy="266" r="2.7"/><circle cx="809" cy="187" r="2.4"/><circle cx="772" cy="286" r="2.2"/>
+      <circle cx="252" cy="420" r="2.5"/><circle cx="361" cy="472" r="2.6"/><circle cx="430" cy="548" r="2.2"/><circle cx="948" cy="420" r="2.5"/>
+      <circle cx="839" cy="472" r="2.6"/><circle cx="770" cy="548" r="2.2"/><circle cx="320" cy="612" r="2.8"/><circle cx="880" cy="612" r="2.8"/>
+    </g>
+
+    <path d="M600 480c-82 0-109 61-102 126 7 66 46 126 102 145 56-19 95-79 102-145 7-65-20-126-102-126Z" fill="#8e5555" opacity=".35" filter="url(#softShadow)"/>
+    <path d="M600 470c-60 1-85 57-76 130 8 63 35 112 76 133V470Z" fill="url(#foldL)" stroke="#7e4549" stroke-width="4"/>
+    <path d="M600 470c60 1 85 57 76 130-8 63-35 112-76 133V470Z" fill="url(#foldR)" stroke="#7e4549" stroke-width="4"/>
+    <path d="M600 497c-16 39-17 145 0 206 17-61 16-167 0-206Z" fill="#5b303a" opacity=".88"/>
+    <path d="M581 504c-22 57-14 139 17 184" fill="none" stroke="#f2b2a3" stroke-width="7" stroke-linecap="round" opacity=".48"/>
+    <path d="M619 504c22 57 14 139-17 184" fill="none" stroke="#6e333f" stroke-width="8" stroke-linecap="round" opacity=".5"/>
+
+    <path d="M543 462c18-27 38-43 57-47 19 4 39 20 57 47-17-7-36-10-57-10s-40 3-57 10Z" fill="#b86f68" opacity=".58"/>
+    <ellipse cx="600" cy="389" rx="43" ry="35" fill="#b95359" stroke="#71313b" stroke-width="5" filter="url(#softShadow)"/>
+    <ellipse cx="600" cy="387" rx="35" ry="27" fill="url(#nodule)"/>
+    <ellipse cx="586" cy="376" rx="12" ry="8" fill="#ffe2d0" opacity=".72"/>
+    <path d="M577 400c13 8 32 10 48 1" fill="none" stroke="#7f3541" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+    <path d="M600 292C505 294 456 341 458 402c2 51 38 87 95 101 16 4 31 9 47 20 16-11 31-16 47-20 57-14 93-50 95-101 2-61-47-108-142-110Z" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="19 16" opacity=".98"/>
+    <path d="M600 292C505 294 456 341 458 402c2 51 38 87 95 101 16 4 31 9 47 20 16-11 31-16 47-20 57-14 93-50 95-101 2-61-47-108-142-110Z" fill="none" stroke="#17645e" stroke-width="3" stroke-linecap="round" stroke-dasharray="19 16" stroke-dashoffset="7" opacity=".95"/>
+  </g>
+
+  <ellipse cx="600" cy="405" rx="430" ry="355" fill="none" stroke="#a9d5cb" stroke-width="9" opacity=".55"/>
+  <g transform="translate(54 56)">
+    <rect width="297" height="74" rx="19" fill="#103d3d" opacity=".92"/>
+    <circle cx="35" cy="37" r="13" fill="#d96f67"/>
+    <text x="60" y="31" fill="#fff" font-family="Inter,Arial,sans-serif" font-size="20" font-weight="700">Masa en pliegue dorsal</text>
+    <text x="60" y="54" fill="#cde8e1" font-family="Inter,Arial,sans-serif" font-size="15">planificación preoperatoria</text>
+  </g>
+</svg>
