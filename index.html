@@ -68,11 +68,38 @@ function applyVS2(out){
   });
   return out;
 }
+const VS2V2_REFS={
+  Q001:'Johnston SA, Tobias KM, eds. Veterinary Surgery: Small Animal. 2.ª ed., vol. 2. Elsevier; 2018. Capítulo 110, pp. 2131-2142.',
+  Q002:'Johnston SA, Tobias KM, eds. Veterinary Surgery: Small Animal. 2.ª ed., vol. 2. Elsevier; 2018. Capítulo 111, pp. 2142-2157.',
+  Q003:'Johnston SA, Tobias KM, eds. Veterinary Surgery: Small Animal. 2.ª ed., vol. 2. Elsevier; 2018. Capítulo 111, pp. 2142-2157.',
+  Q004:'Johnston SA, Tobias KM, eds. Veterinary Surgery: Small Animal. 2.ª ed., vol. 2. Elsevier; 2018. Capítulo 109, pp. 2109-2130.',
+  Q007:'Johnston SA, Tobias KM, eds. Veterinary Surgery: Small Animal. 2.ª ed., vol. 2. Elsevier; 2018. Capítulo 109, pp. 2109-2130.'
+};
+const VS2V2_UPDATES={
+  Q001:{puntosCriticos:'Complemento Veterinary Surgery vol. 2: la vulva recibe ramas de la arteria pudenda externa y el drenaje linfático de los genitales externos se dirige anatómicamente hacia los ganglios ilíacos superficiales. Esta referencia ayuda a planificar la disección y la estadificación, pero no sustituye la evaluación individual del drenaje tumoral.'},
+  Q002:{protocolo:'Complemento Veterinary Surgery vol. 2: la incisión escrotal se orienta paralela al septo medio y entre este y la cara lateral. Tras una tracción caudal lenta y suave, la autoligadura puede realizarse con una mosquito Halsted mediante nudo simple sobre la pinza o en ocho. El cordón se secciona 2-6 mm distal al nudo, se inspecciona antes de soltarlo y las incisiones se dejan abiertas para cicatrizar por segunda intención.'},
+  Q003:{material:'Complemento Veterinary Surgery vol. 2: la técnica cerrada conserva íntegra la túnica vaginal parietal; la abierta la incide. Como referencia, se describen dos ligaduras circunferenciales para cordones pequeños (≤0,5 cm), una circunferencial proximal y una transfixiante distal para cordones de 0,5-1 cm, y la técnica abierta para cordones mayores si permite ligaduras más seguras. Se utiliza monofilamento absorbible 3-0 a 0 según el diámetro.'},
+  Q004:{protocolo:'Complemento Veterinary Surgery vol. 2: en una ovariectomía abierta, la hemostasia incluye los vasos ováricos y los vasos uterinos al nivel del ligamento propio, inmediatamente craneales al cuerno uterino. El mesosalpinx se secciona craneal al cuerno para evitar lesionarlo. Si el útero presenta alteraciones, el procedimiento debe convertirse en ovariohisterectomía.'},
+  Q007:{material:'Complemento Veterinary Surgery vol. 2: para un útero con piometra se prevén una incisión más larga, compresas de laparotomía humedecidas para aislarlo, pinzas atraumáticas tipo Doyen si es necesario sujetar el cuerpo uterino y monofilamento absorbible 2-0 o 3-0 para los vasos aumentados del ligamento ancho. Un cuerpo uterino grande puede requerir ligaduras transfixiantes-circunferenciales bilaterales.',protocolo:'Complemento Veterinary Surgery vol. 2: estabilizar primero hidratación, equilibrio ácido-base y perfusión, e iniciar el antibiótico intravenoso definido por el hospital antes o durante la inducción. El útero distendido y friable se aísla antes de manipularlo; se evita el triple pinzamiento traumático del cuerpo uterino. Si existe contaminación o peritonitis, se realiza lavado abdominal abundante con solución salina templada y se valora drenaje según los hallazgos.'}
+};
+function applyVS2V2(out){
+  const ref=VS2V2_REFS[out.id];
+  if(ref && !String(out.fuentes||'').includes('2.ª ed., vol. 2.')){
+    out.fuentes=(String(out.fuentes||'').trim()+'\n'+ref).trim();
+  }
+  const additions=VS2V2_UPDATES[out.id]||{};
+  Object.entries(additions).forEach(([k,addition])=>{
+    if(!String(out[k]||'').includes('Complemento Veterinary Surgery vol. 2')){
+      out[k]=(String(out[k]||'').trim()+'\n\n'+addition).trim();
+    }
+  });
+  return out;
+}
 let records=load(), page='dashboard', opened=null, editing=null, search='', cat='Todas';
 function load(){
   try{
     const v=JSON.parse(localStorage.getItem(KEY));
-    if(!Array.isArray(v)) return structuredClone(base).map(applyVS2);
+    if(!Array.isArray(v)) return structuredClone(base).map(applyVS2).map(applyVS2V2);
     const enrichedKeys=['material','protocolo','puntosCriticos','fuentes','image'];
     const migrated=v.map(r=>{
       const b=base.find(x=>x.id===r.id);
@@ -91,14 +118,14 @@ function load(){
           out[k]=(String(out[k]||'').trim()+'\n\n'+addition).trim();
         }
       });
-      return applyVS2(out);
+      return applyVS2V2(applyVS2(out));
     });
     const newest=base.find(x=>x.id==='Q008');
-    if(newest && !migrated.some(r=>r.id==='Q008')) migrated.push(applyVS2(structuredClone(newest)));
+    if(newest && !migrated.some(r=>r.id==='Q008')) migrated.push(applyVS2V2(applyVS2(structuredClone(newest))));
     localStorage.setItem(KEY,JSON.stringify(migrated));
     return migrated;
   }catch{
-    return structuredClone(base).map(applyVS2);
+    return structuredClone(base).map(applyVS2).map(applyVS2V2);
   }
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(records));toast('Cambios guardados en este navegador')}
