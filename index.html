@@ -18,6 +18,8 @@
 .procedure-card img{width:100%;height:300px;object-fit:cover;display:block}
 .procedure-card.radiography{background:#050608}
 .procedure-card.radiography img{object-fit:contain;background:#050608}
+.procedure-card.planning{background:#216a68}
+.procedure-card.planning img{object-fit:contain}
 .procedure-card figcaption{background:#ed865fe8}
 .evidence-note{margin-top:18px;background:#e9f5ee;color:#285b4c;border:1px solid #cee6d6}
 .block.reference{background:#f7fbf8;border-color:#d6e8db}
@@ -211,7 +213,7 @@ function artwork(r,wide=false){
   const photo=`<figure class="photo-card"><img src="${escapeHtml(r.image||'assets/labrador.webp')}" alt="${escapeHtml(alt)}" loading="${wide?'eager':'lazy'}"><figcaption>Retrato ilustrativo generado · no corresponde al paciente</figcaption></figure>`;
   if(!wide) return `<figure class="artwork" aria-label="${escapeHtml(alt)}"><img src="${escapeHtml(r.image||'assets/labrador.webp')}" alt="" loading="lazy"><figcaption class="art-caption">${label}</figcaption></figure>`;
   const procedure=r.procedureImage
-    ?`<figure class="procedure-card ${r.id==='Q008'?'radiography':''}"><img src="${escapeHtml(r.procedureImage)}" alt="${escapeHtml(r.procedureAlt||'Simulación educativa del procedimiento')}" loading="eager"><figcaption>${escapeHtml(r.procedureCaption||'Simulación educativa · no corresponde al paciente')}</figcaption></figure>`
+    ?`<figure class="procedure-card ${r.id==='Q008'?'radiography':(r.id==='Q001'?'planning':'')}"><img src="${escapeHtml(r.procedureImage)}" alt="${escapeHtml(r.procedureAlt||'Simulación educativa del procedimiento')}" loading="eager"><figcaption>${escapeHtml(r.procedureCaption||'Simulación educativa · no corresponde al paciente')}</figcaption></figure>`
     :`<figure class="procedure-card">${procedureDiagram(r)}<figcaption>Esquema didáctico original · no a escala</figcaption></figure>`;
   return `<div class="detail-media">${photo}${procedure}</div>`;
 }
